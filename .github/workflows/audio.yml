@@ -1,0 +1,37 @@
+name: Audio Factory - Bangla gTTS
+
+on:
+  repository_dispatch:
+    types: [pick_case_study, start-factory, audio-only]
+  workflow_dispatch:
+
+jobs:
+  audio-factory:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install deps
+        run: |
+          pip install -q -r audio/requirements.txt
+
+      - name: Run Audio Factory (Your gTTS version)
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GOOGLE_SERVICE_JSON: ${{ secrets.GOOGLE_SERVICE_JSON }}
+          GOOGLE_DOC_ID: ${{ secrets.GOOGLE_DOC_ID }}
+          GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
+        run: |
+          python audio/factory.py
+
+      - name: Upload mp3 artifact (backup)
+        uses: actions/upload-artifact@v4
+        with:
+          name: audio-mp3
+          path: output/

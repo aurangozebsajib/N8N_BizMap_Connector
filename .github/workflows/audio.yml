@@ -1,8 +1,6 @@
 name: Audio Factory - Bangla gTTS
 
 on:
-  repository_dispatch:
-    types: [pick_case_study, start-factory, audio-only]
   workflow_dispatch:
 
 jobs:
@@ -12,14 +10,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Python 3.11
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Install deps
-        run: |
-          pip install -q -r audio/requirements.txt
+      - name: Install deps clean
+        run: pip uninstall -y google-generativeai || true
+
+      - name: Install new deps
+        run: pip install -q --upgrade google-genai gTTS google-api-python-client google-auth google-auth-oauthlib
+
+      - name: Install requirements
+        run: pip install -q -r audio/requirements.txt || true
 
       - name: Run Audio Factory (Your gTTS version)
         env:
@@ -27,11 +30,4 @@ jobs:
           GOOGLE_SERVICE_JSON: ${{ secrets.GOOGLE_SERVICE_JSON }}
           GOOGLE_DOC_ID: ${{ secrets.GOOGLE_DOC_ID }}
           GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
-        run: |
-          python audio/factory.py
-
-      - name: Upload mp3 artifact (backup)
-        uses: actions/upload-artifact@v4
-        with:
-          name: audio-mp3
-          path: output/
+        run: python audio/factory.py

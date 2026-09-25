@@ -1,4 +1,4 @@
-import os, re, json
+import os, re, json, time, random, requests
 from gtts import gTTS
 from google import genai
 from google.genai import types
@@ -8,6 +8,7 @@ from googleapiclient.http import MediaFileUpload
 
 print("=== AUDIO FACTORY START ===")
 GEMINI_KEY = os.environ.get("GEMINI_API_KEY")
+OPENROUTER_KEY = os.environ.get("OPENROUTER_API")
 SERVICE_JSON_STR = os.environ.get("GOOGLE_SERVICE_JSON")
 DOC_ID = os.environ.get("GOOGLE_DOC_ID")
 SHEET_ID = os.environ.get("GOOGLE_SHEET_ID")
@@ -22,60 +23,96 @@ doc = docs_service.documents().get(documentId=DOC_ID).execute()
 full_text = "".join([elem['textRun']['content'] for el in doc.get('body').get('content', []) for elem in el.get('paragraph',{}).get('elements',[]) if 'textRun' in elem])
 cases = re.split(r'Case \d+', full_text, flags=re.IGNORECASE)
 case_text = cases[1][:3000] if len(cases) > 1 else full_text[:3000]
-print(f"Case Found: {len(case_text)} chars")
+print(f"Case length: {len(case_text)}")
 
-# === AUTO MODEL FINDER ===
-client = genai.Client(api_key=GEMINI_KEY, http_options=types.HttpOptions(api_version='v1'))
-
-PREFERRED_MODELS = [
-    "gemini-3.8-flash",
-    "gemini-3.7-flash",
-    "gemini-3.6-flash",
-    "gemini-3.5-flash",
-    "gemini-2.5-flash",
-    "gemini-flash-latest",
-    "gemini-pro-latest"
-]
-
-prompt = f"""
-You are a professional Bangla Audiobook writer.
+prompt = f"""You are a professional Bangla Audiobook writer.
 Convert this business case into natural emotional Bangla story for gTTS.
-RULES: Pure Bangla unicode, 450-550 words, start with hook.
+RULES: Pure Bangla unicode only, no English, 450-550 words, start with a hook question, conversational story telling.
 After script give:
 TITLE_1: catchy bangla title max 8 words
 TITLE_2: another title
 KEYWORDS: 5 keywords comma separated
-Case: {case_text}
-"""
+Case: {case_text}"""
 
 bangla_script = None
-last_error = None
-for model_name in PREFERRED_MODELS:
-    try:
-        print(f"Trying model: {model_name}...")
-        response = client.models.generate_content(model=model_name, contents=prompt)
-        bangla_script = response.text
-        print(f"SUCCESS with {model_name}")
+
+# === TRY 1: GEMINI WITH AUTO-RETRY ===
+MODELS_TO_TRY = [
+    ("v1", "gemini-3.8-flash"),
+    ("v1beta", "gemini-3.8-flash"),
+    ("v1beta", "gemini-3-flash-preview"),
+    ("v1beta", "gemini-2.5-flash-lite"),
+]
+
+for api_ver, model_name in MODELS_TO_TRY:
+    for attempt in range(2):
+        try:
+            print(f"Trying GEMINI {api_ver}/{model_name} attempt {attempt+1}")
+            client = genai.Client(api_key=GEMINI_KEY, http_options=types.HttpOptions(api_version=api_ver))
+            response = client.models.generate_content(model=model_name, contents=prompt)
+            bangla_script = response.text
+            print(f"GEMINI SUCCESS: {model_name}")
+            break
+        except Exception as e:
+            err = str(e)
+            if "503" in err or "UNAVAILABLE" in err:
+                print(f"503 overload, wait...")
+                time.sleep(15)
+                continue
+            print(f"Gemini failed: {err[:200]}")
+            break
+    if bangla_script:
         break
+
+# === TRY 2: OPENROUTER FALLBACK ===
+if not bangla_script:
+    print("Gemini all failed, switching to OPENROUTER...")
+    if not OPENROUTER_KEY:
+        raise Exception("OPENROUTER_API secret missing")
+
+    try:
+        url = "https://openrouter.ai/api/v1/chat/completions"
+        headers = {
+            "Authorization": f"Bearer {OPENROUTER_KEY}",
+            "Content-Type": "application/json",
+            "HTTP-Referer": "https://github.com/aurangozebsajib/N8N_BizMap_Connector",
+            "X-Title": "Bangla Audio Factory"
+        }
+        data = {
+            "model": "inclusionai/ling-3.0-flash-fin:free",
+            "messages": [{"role": "user", "content": prompt}],
+            "max_tokens": 3000,
+            "temperature": 0.7
+        }
+        resp = requests.post(url, headers=headers, json=data, timeout=60)
+        print(f"OpenRouter status: {resp.status_code}")
+        if resp.status_code == 200:
+            j = resp.json()
+            bangla_script = j['choices'][0]['message']['content']
+            print("OPENROUTER SUCCESS")
+            print(bangla_script[:300])
+        else:
+            print(f"OpenRouter failed: {resp.text[:500]}")
+            raise Exception(f"OpenRouter error {resp.status_code}: {resp.text[:500]}")
     except Exception as e:
-        print(f"Failed {model_name}: {str(e)[:150]}")
-        last_error = e
-        continue
+        raise Exception(f"Both Gemini and OpenRouter failed. Last error: {e}")
 
 if not bangla_script:
-    raise Exception(f"All models failed. Last error: {last_error}")
+    raise Exception("No script generated")
 
-print(bangla_script[:300])
+# === TTS + UPLOAD (same) ===
+print("Generating MP3...")
 title_match = re.search(r'TITLE_1:\s*(.*)', bangla_script)
-title = re.sub(r'[^\w\s\u0980-\u09FF-]', '', title_match.group(1).strip() if title_match else "Bangla_Business_Audio")[:60]
-tts_text = re.split(r'TITLE_1:', bangla_script)[0].strip()[:4000]
+raw_title = title_match.group(1).strip() if title_match else "Bangla_Business_Audio"
+title = re.sub(r'[^\w\s\u0980-\u09FF-]', '', raw_title)[:60].strip()
+if not title:
+    title = "Bangla_Audio_1"
 
+tts_text = re.split(r'TITLE_1:', bangla_script)[0].strip()[:4000]
 os.makedirs("output", exist_ok=True)
 mp3_path = f"output/{title}.mp3"
 gTTS(text=tts_text, lang='bn', slow=False).save(mp3_path)
-print(f"MP3 saved")
 
-# Drive Upload
 folder_name = "n8n-bangla-tts"
 q = f"mimeType='application/vnd.google-apps.folder' and name='{folder_name}' and trashed=false"
 folders = drive_service.files().list(q=q, fields="files(id)").execute().get('files', [])
@@ -84,12 +121,12 @@ file = drive_service.files().create(body={'name': os.path.basename(mp3_path), 'p
 drive_link = file.get('webViewLink')
 print(f"Uploaded: {drive_link}")
 
-# Sheet
 try:
     t2 = re.search(r'TITLE_2:\s*(.*)', bangla_script)
     kw = re.search(r'KEYWORDS:\s*(.*)', bangla_script)
-    row = [title, t2.group(1).strip() if t2 else "", kw.group(1).strip() if kw else "", tts_text[:5000], drive_link, "Auto Model"]
+    row = [title, t2.group(1).strip() if t2 else "", kw.group(1).strip() if kw else "", tts_text[:4000], drive_link, "Auto Gemini+OpenRouter"]
     sheets_service.spreadsheets().values().append(spreadsheetId=SHEET_ID, range="AI_Outputs!A:F", valueInputOption="USER_ENTERED", body={"values": [row]}).execute()
+    print("Sheet updated")
 except Exception as e:
     print(f"Sheet error: {e}")
 

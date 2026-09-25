@@ -69,7 +69,7 @@ KEYWORDS: 5 keywords comma separated
 """
 
 response = client.models.generate_content(
-        model="gemini-2.5-flash",
+    model="gemini-1.5-flash",
     contents=prompt
 )
 bangla_script = response.text

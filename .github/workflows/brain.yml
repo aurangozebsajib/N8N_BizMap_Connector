@@ -1,0 +1,31 @@
+name: brain-factory
+on:
+  workflow_dispatch:
+    inputs:
+      case_index:
+        description: 'Case index (0 = first case)'
+        required: false
+        default: '0'
+
+jobs:
+  run-brain:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install deps
+        run: pip install -r brain/requirements.txt
+      - name: Run Brain Pipeline
+        run: python brain/main.py
+        env:
+          GOOGLE_SERVICE_JSON: ${{ secrets.GOOGLE_SERVICE_JSON }}
+          GOOGLE_DOC_ID: ${{ secrets.GOOGLE_DOC_ID }}
+          GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
+          CASE_INDEX: ${{ inputs.case_index }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: brain-outputs
+          path: output/*

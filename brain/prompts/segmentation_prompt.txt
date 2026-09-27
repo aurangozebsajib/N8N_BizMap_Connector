@@ -1,0 +1,14 @@
+Given this master Bangla script, split into 2-6 ordered segments and classify each as one of: text-to-video, image-to-video, text-animation, lip-sync based on content.
+
+Rules:
+- dialogue-heavy -> lip-sync
+- description-heavy -> text-to-video
+- fixed scene with character -> image-to-video
+- stat/quote/number -> text-animation
+- Estimate duration by word count at 2.5 words/sec
+
+MASTER: {MASTER_SCRIPT}
+CASE_ID: {CASE_ID}
+
+Return STRICT JSON only, no markdown, no explanation:
+{"case_id": "string", "master_script_bn": "string", "segments": [{"segment_id":1,"text_portion":"string","video_type":"text-to-video | image-to-video | text-animation | lip-sync","visual_prompt":"English visual prompt for video model","style_notes":"string","sound_design":{"music_mood":"string","sfx":["string"]},"duration_estimate_sec":6}]}

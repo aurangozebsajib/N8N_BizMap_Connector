@@ -1,0 +1,3 @@
+From this case: {CASE_TEXT}
+
+Write a detailed, reusable character description for a consistent protagonist: age, gender, face, clothing, art style (e.g., semi-realistic corporate illustration, clean 2D flat, anime style), color palette, background style. Keep it under 80 words, in English, optimized for Stable Diffusion / text-to-image models. No extra text.

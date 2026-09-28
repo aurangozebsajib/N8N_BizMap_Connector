@@ -1,8 +1,5 @@
-gspread
-google-api-python-client
-google-auth
-google-auth-oauthlib
-google-genai
 gTTS
 pydub
+gspread
+google-auth
 requests

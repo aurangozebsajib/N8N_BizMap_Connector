@@ -2,30 +2,134 @@ name: brain-factory
 on:
   workflow_dispatch:
     inputs:
-      case_index:
-        description: 'Case index (0 = first case)'
+      video_date:
+        description: "Date YYYY-MM-DD (empty = today BD)"
         required: false
-        default: '0'
+        default: ""
+        type: string
+      video_number:
+        description: "Video number (optional)"
+        required: false
+        default: ""
+        type: string
+      run_audio:
+        description: "Run audio job"
+        required: false
+        default: true
+        type: boolean
+      run_video:
+        description: "Run video job"
+        required: false
+        default: true
+        type: boolean
+      character_mode:
+        description: "Character mode"
+        required: false
+        default: "per_video"
+        type: choice
+        options:
+          - per_video
+          - fixed
+
+permissions:
+  contents: read
 
 jobs:
-  run-brain:
+  plan:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
       - name: Install deps
         run: pip install -r brain/requirements.txt
-      - name: Run Brain Pipeline
-        run: python brain/main.py
+      - name: Run plan
         env:
           GOOGLE_SERVICE_JSON: ${{ secrets.GOOGLE_SERVICE_JSON }}
-          GOOGLE_DOC_ID: ${{ secrets.GOOGLE_DOC_ID }}
-          GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
-          CASE_INDEX: ${{ inputs.case_index }}
-      - uses: actions/upload-artifact@v4
-        if: always()
+          STORY_STORAGE_DOC: ${{ secrets.STORY_STORAGE_DOC }}
+          API_KEYS_SHEET: ${{ secrets.API_KEYS_SHEET }}
+          MODEL_STORAGE_SHEET: ${{ secrets.MODEL_STORAGE_SHEET }}
+          VIDEO_DATE: ${{ inputs.video_date }}
+          VIDEO_NUMBER: ${{ inputs.video_number }}
+          CHARACTER_MODE: ${{ inputs.character_mode }}
+        run: python brain/main.py --mode plan
+      - name: Upload plan artifact
+        uses: actions/upload-artifact@v4
         with:
-          name: brain-outputs
-          path: output/*
+          name: plan
+          path: |
+            output/plan.json
+            output/narration.txt
+
+  audio:
+    needs: plan
+    if: ${{ inputs.run_audio }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - name: Install deps
+        run: pip install -r audio/requirements.txt
+      - name: Download plan artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: plan
+          path: output
+      - name: Run audio
+        env:
+          GOOGLE_SERVICE_JSON: ${{ secrets.GOOGLE_SERVICE_JSON }}
+          MODEL_STORAGE_SHEET: ${{ secrets.MODEL_STORAGE_SHEET }}
+          UPLOAD_CATBOX: "false"
+        run: python audio/factory.py
+      - name: Upload audio
+        uses: actions/upload-artifact@v4
+        with:
+          name: audio-mp3
+          path: output/audio/*
+
+  video:
+    needs: plan
+    if: ${{ always() && inputs.run_video }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install system deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg fonts-noto-core libraqm0 libfribidi0 libharfbuzz0b
+      - name: Install deps
+        run: pip install -r brain/requirements.txt
+      - name: Download plan artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: plan
+          path: output
+      - name: Run video
+        env:
+          GOOGLE_SERVICE_JSON: ${{ secrets.GOOGLE_SERVICE_JSON }}
+          API_KEYS_SHEET: ${{ secrets.API_KEYS_SHEET }}
+          MODEL_STORAGE_SHEET: ${{ secrets.MODEL_STORAGE_SHEET }}
+          CHARACTER_MODE: ${{ inputs.character_mode }}
+          LOCAL_FALLBACK: "true"
+          MAX_SEGMENTS: "10"
+        run: python brain/main.py --mode video
+      - name: Upload video clips
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: video-clips
+          path: output/video/*

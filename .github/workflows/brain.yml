@@ -9,6 +9,8 @@ jobs:
   plan:
     runs-on: ubuntu-latest
     steps:
+      - name: Disable Python Bytecode Cache
+        run: echo "PYTHONDONTWRITEBYTECODE=1" >> $GITHUB_ENV
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -41,6 +43,8 @@ jobs:
     needs: plan
     runs-on: ubuntu-latest
     steps:
+      - name: Disable Python Bytecode Cache
+        run: echo "PYTHONDONTWRITEBYTECODE=1" >> $GITHUB_ENV
       - name: Checkout code
         uses: actions/checkout@v4
 

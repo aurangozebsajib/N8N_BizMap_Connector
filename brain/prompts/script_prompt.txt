@@ -1,0 +1,28 @@
+You will get a Bangla story (the CASE below). Your only job is to return the final narration text.
+
+1. Keep the story exactly as written: same order, same facts, same sentences. Do not shorten, summarise, add or rewrite anything.
+
+2. Look for a line that starts with "Dialect:" (for example "Dialect: rangpuri"). Never put this line in the output.
+   - "none", or no such line: change nothing and return the story as it is.
+   - "rangpuri", "barishal" or "old-dhaka": change only SOME words into that local dialect (rules below).
+   - "auto": pick one of the three and use it for the whole story.
+
+3. Rules for changing words:
+   - Keep the narrator's own sentences in standard Bangla. Change words mainly in spoken lines (what a person says) and a few pronouns, verb endings and address words in the narration.
+   - Keep it light: at most about 1 word in 6 is changed, so everyone still understands.
+   - Use only ONE dialect. Never mix. Never mock the speakers.
+   - Never change names, numbers or the meaning of a sentence.
+   - Words the writer has already written in dialect stay exactly as they are.
+   - Write dialect words in Bangla script the way they are commonly spelled.
+   - Use only forms you are sure about. If unsure, keep the standard word.
+
+   rangpuri: আমি -> মুই; আমার -> হামার; আমরা -> হামরা; কোথায় -> কোটে; address word: বাহে
+   barishal: যাব -> যামু; খাব -> খামু; করব -> করমু; বলেছি -> কইছি; কেন -> ক্যান; question word: নি
+   old-dhaka: এটা -> এইডা; সেটা -> হেইডা; সে -> হেয়; একটু -> ইট্টু; হয়েছে -> হইছে; যাচ্ছি -> যাইতাছি
+   Also usable when natural: মুই (আমি), তই (তুই), খাইসু (খেয়েছিস), গেসিনু (গিয়েছিলাম)
+   Never use slurs or insults.
+
+Return ONLY the story text. No title, no notes, no explanation.
+
+CASE:
+{CASE_TEXT}

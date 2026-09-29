@@ -1,26 +1,10 @@
 import os
 import sys
 import argparse
+import requests
 
 def run_plan():
     print("Running plan mode successfully...")
-    # এখানে আপনার মূল প্ল্যান লজিক থাকবে যা ব্রেইনকে ইনিশিয়ালাইজ করবে
-
-def main():
-    parser = argparse.ArgumentParser(description="Brain Factory Main Runner")
-    parser.add_argument("--mode", type=str, default="plan", help="Execution mode")
-    args = parser.parse_args()
-    
-    if args.mode == "plan":
-        run_plan()
-    else:
-        print(f"Executing mode: {args.mode}")
-
-if __name__ == "__main__":
-    main()
-
-
-import requests
 
 def send_video_to_telegram(file_path, caption=""):
     bot_token = os.environ.get("TELEGRAM_BOT_TOKEN")
@@ -44,3 +28,24 @@ def send_video_to_telegram(file_path, caption=""):
     except Exception as e:
         print(f"Exception during Telegram send: {e}")
         return False
+
+def run_video_mode():
+    print("Running video generation mode...")
+    # আপনার ভিডিও ফাইল পাথ এখানে সেট হবে (যেমন আউটপুট ফোল্ডার থেকে)
+    # উদাহরণস্বরূপ: target_file = "output_clip.mp4"
+    # send_video_to_telegram(target_file, caption="🎬 BizMap Video Clip")
+
+def main():
+    parser = argparse.ArgumentParser(description="Brain Factory Main Runner")
+    parser.add_argument("--mode", type=str, default="plan", help="Execution mode")
+    args = parser.parse_args()
+    
+    if args.mode == "plan":
+        run_plan()
+    elif args.mode == "video":
+        run_video_mode()
+    else:
+        print(f"Executing mode: {args.mode}")
+
+if __name__ == "__main__":
+    main()

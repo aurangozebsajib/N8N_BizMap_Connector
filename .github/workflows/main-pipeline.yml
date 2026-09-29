@@ -1,4 +1,4 @@
-name: N8N BizMap Pipeline
+name: BizMap Automation Pipeline
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  execute-pipeline:
+  run-all:
     runs-on: ubuntu-latest
     env:
       PYTHONDONTWRITEBYTECODE: '1'
@@ -22,11 +22,11 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install requests
-    - name: Run Plan Mode
+    - name: Execute Plan Mode
       run: |
         export PYTHONPATH=.
         python brain/main.py --mode plan
-    - name: Run Video Mode & Send to Telegram
+    - name: Execute Video Mode & Telegram Dispatch
       run: |
         export PYTHONPATH=.
         python brain/main.py --mode video

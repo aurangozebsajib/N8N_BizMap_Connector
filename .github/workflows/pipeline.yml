@@ -1,4 +1,4 @@
-name: brain-factory
+name: Complete N8N Pipeline
 
 on:
   workflow_dispatch:
@@ -6,23 +6,23 @@ on:
     branches: [ main ]
 
 jobs:
-  run-all:
+  execute-all:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
+    - name: Checkout Repository
       uses: actions/checkout@v4
 
-    - name: Set up Python
+    - name: Set up Python 3.10
       uses: actions/setup-python@v5
       with:
         python-version: '3.10'
 
-    - name: Install dependencies
+    - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-    - name: Execute Plan and Video Mode
+    - name: Run Complete Workflow (Plan and Video Modes)
       env:
         GOOGLE_SERVICE_JSON: ${{ secrets.GOOGLE_SERVICE_JSON }}
         API_KEYS_SHEET: ${{ secrets.API_KEYS_SHEET }}
@@ -34,7 +34,7 @@ jobs:
         PYTHONDONTWRITEBYTECODE: '1'
       run: |
         export PYTHONPATH=.
-        echo "=== Running Plan Mode ==="
+        echo "=== Executing Plan Mode ==="
         python brain/main.py --mode plan
-        echo "=== Running Video Mode & Telegram Dispatch ==="
+        echo "=== Executing Video Mode & Telegram Dispatch ==="
         python brain/main.py --mode video

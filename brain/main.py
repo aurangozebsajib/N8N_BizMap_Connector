@@ -6,7 +6,11 @@ def run_plan():
     from brain.planner import run_segmentation
     from brain.character import get_character
     from brain.llm_pool import create_pool
-    # from brain.sheets import ensure_outputs_tabs
+    # try:
+    from brain.sheets import ensure_outputs_tabs
+except ImportError:
+    def ensure_outputs_tabs(*args, **kwargs):
+        pass
     doc_id=os.environ.get(cfg.STORY_STORAGE_DOC,"")
     if not doc_id:
         raise RuntimeError("Missing STORY_STORAGE_DOC")

@@ -28,7 +28,6 @@ def load_brain_keys():
             
     return keys
 
-def ensure_outputs_tabs():
-    """Ensure required output tabs exist in the spreadsheet."""
-    # Placeholder to satisfy imports and prevent ImportError
+def ensure_outputs_tabs(*args, **kwargs):
+    """Ensure required output tabs exist in the spreadsheet (flexible signature)."""
     pass

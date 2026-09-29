@@ -1,4 +1,4 @@
-name: Brain Pipeline
+name: N8N BizMap Pipeline
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  run-pipeline:
+  execute-pipeline:
     runs-on: ubuntu-latest
     env:
       PYTHONDONTWRITEBYTECODE: '1'

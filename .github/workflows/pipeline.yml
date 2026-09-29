@@ -22,6 +22,20 @@ jobs:
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
+    - name: Verify Environment Secrets Presence
+      run: |
+        echo "Checking if Telegram secrets are available..."
+        if [ -z "${{ secrets.TELEGRAM_BOT_TOKEN }}" ]; then
+          echo "❌ TELEGRAM_BOT_TOKEN is MISSING!"
+        else
+          echo "✅ TELEGRAM_BOT_TOKEN is present."
+        fi
+        if [ -z "${{ secrets.TELEGRAM_CHANNEL_ID }}" ]; then
+          echo "❌ TELEGRAM_CHANNEL_ID is MISSING!"
+        else
+          echo "✅ TELEGRAM_CHANNEL_ID is present."
+        fi
+
     - name: Run Complete Workflow (Plan and Video Modes)
       env:
         GOOGLE_SERVICE_JSON: ${{ secrets.GOOGLE_SERVICE_JSON }}

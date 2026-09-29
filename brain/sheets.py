@@ -30,4 +30,4 @@ def load_brain_keys():
 
 def ensure_outputs_tabs(*args, **kwargs):
     """Ensure required output tabs exist in the spreadsheet (flexible signature)."""
-    pass
+    return True

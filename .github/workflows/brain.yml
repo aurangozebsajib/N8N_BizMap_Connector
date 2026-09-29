@@ -29,6 +29,7 @@ jobs:
           GOOGLE_SERVICE_JSON: ${{ secrets.GOOGLE_SERVICE_JSON }}
           API_KEYS_SHEET: ${{ secrets.API_KEYS_SHEET }}
           MODEL_STORAGE_SHEET: ${{ secrets.MODEL_STORAGE_SHEET }}
+          STORY_STORAGE_DOC: ${{ secrets.STORY_STORAGE_DOC }}
 
       - name: Upload Plan Artifact
         uses: actions/upload-artifact@v4
@@ -66,6 +67,7 @@ jobs:
           API_KEYS_SHEET: ${{ secrets.API_KEYS_SHEET }}
           MODEL_STORAGE_SHEET: ${{ secrets.MODEL_STORAGE_SHEET }}
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          STORY_STORAGE_DOC: ${{ secrets.STORY_STORAGE_DOC }}
 
       - name: Upload Video Artifact
         uses: actions/upload-artifact@v4

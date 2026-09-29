@@ -7,7 +7,7 @@ def run_plan():
     from brain.character import get_character
     from brain.llm_pool import create_pool
     # try:
-    from brain.sheets import ensure_outputs_tabs
+    # from brain.sheets import ensure_outputs_tabs
 except ImportError:
     def ensure_outputs_tabs(*args, **kwargs):
         pass
@@ -56,7 +56,7 @@ except ImportError:
     narr_path.write_text(master_bn, encoding="utf-8")
     print(f"Wrote {plan_path} and {narr_path}")
     try:
-        # ensure_outputs_tabs()
+        # # ensure_outputs_tabs()
     except Exception as e:
         print(f"Warning ensure tabs failed: {e}")
     print(f"Plan done: {video_label} words {total_words} sec {total_sec} segments {len(segments)}")

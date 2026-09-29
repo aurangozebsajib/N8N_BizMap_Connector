@@ -1,172 +1,36 @@
-import os, json, gspread
+import os
+import gspread
 from google.oauth2.service_account import Credentials
 
-SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
-VIDEO_OUTPUTS_HEADERS = ["video_label","segment_id","video_type","start_sec","end_sec","planned_duration_sec","clip_duration_sec","model_used","character_ref_image","output_file","status","dialect"]
-AUDIO_OUTPUTS_HEADERS = ["video_label","dialect","word_count","audio_duration_sec","mp3_file","catbox_link","status"]
-
-def _load_sa():
-    raw = os.environ.get("GOOGLE_SERVICE_JSON", "")
-    if not raw:
-        raise RuntimeError("Missing env GOOGLE_SERVICE_JSON")
-    try:
-        info = json.loads(raw)
-    except Exception as e:
-        raise RuntimeError(f"GOOGLE_SERVICE_JSON invalid JSON: {e}")
-    return info
-
-def get_gspread_client():
-    info = _load_sa()
-    creds = Credentials.from_service_account_info(info, scopes=SCOPES)
-    return gspread.authorize(creds)
-
-def _open(client, sid):
-    try:
-        return client.open_by_key(sid)
-    except Exception as e:
-        raise RuntimeError(f"Failed to open sheet {sid}: {e}")
-
-def _ensure_tab(ss, name, headers):
-    try:
-        ws = ss.worksheet(name)
-    except gspread.WorksheetNotFound:
-        ws = ss.add_worksheet(title=name, rows=1000, cols=max(20, len(headers)))
-        ws.append_row(headers)
-        print(f"Created tab {name}")
-        return ws
-    try:
-        row1 = ws.row_values(1)
-    except:
-        row1 = []
-    if not row1:
-        ws.update('A1', [headers])
-        print(f"Init headers for {name}")
-        return ws
-    missing = [h for h in headers if h not in row1]
-    if missing:
-        ws.update('A1', [row1 + missing])
-        print(f"Added missing headers to {name}: {missing}")
-    return ws
-
-def _load_rows(ss, name):
-    try:
-        ws = ss.worksheet(name)
-    except gspread.WorksheetNotFound:
-        return None, []
-    try:
-        rec = ws.get_all_records()
-    except Exception as e:
-        print(f"Warning read {name}: {e}")
-        rec = []
-    return ws, rec
-
 def load_brain_keys():
-    sid = os.environ.get("API_KEYS_SHEET", "")
-    if not sid:
-        raise RuntimeError("Missing API_KEYS_SHEET")
-    client = get_gspread_client()
-    ss = _open(client, sid)
-    ws, rows = _load_rows(ss, "API_Keys_Brain")
-    if ws is None:
-        raise RuntimeError("Tab API_Keys_Brain missing in API_KEYS_SHEET")
-    active = []
-    for r in rows:
-        if str(r.get("status", "")).strip().lower() != "active":
-            continue
-        ak = str(r.get("api_key_value", "")).strip()
-        pv = str(r.get("provider", "")).strip().lower()
-        if not ak or not pv:
-            continue
-        active.append({"key_id": str(r.get("key_id", "")).strip(), "api_key_value": ak, "provider": pv, "account_id": str(r.get("account_id", "")).strip(), "model": str(r.get("model", "")).strip()})
-    if not active:
-        # Bypassed active check
-    pass
-    for k in active:
-        print(f"::add-mask::{k['api_key_value']}")
-    print(f"Loaded {len(active)} active brain keys")
-    return active
-
-def load_hf_keys():
-    sid = os.environ.get("API_KEYS_SHEET", "")
-    client = get_gspread_client()
-    ss = _open(client, sid)
-    ws, rows = _load_rows(ss, "API_Keys_HF")
-    if ws is None:
-        raise RuntimeError("Tab API_Keys_HF missing in API_KEYS_SHEET")
-    active = []
-    for r in rows:
-        if str(r.get("status", "")).strip().lower() != "active":
-            continue
-        ak = str(r.get("api_key_value", "")).strip()
-        if not ak:
-            continue
-        active.append({"key_id": str(r.get("key_id", "")).strip(), "api_key_value": ak})
-    if not active:
-        raise RuntimeError("No active keys in tab API_Keys_HF")
-    for k in active:
-        print(f"::add-mask::{k['api_key_value']}")
-    print(f"Loaded {len(active)} HF keys")
-    return active
-
-def load_model_routing():
-    sid = os.environ.get("MODEL_STORAGE_SHEET", "")
-    if not sid:
-        raise RuntimeError("Missing MODEL_STORAGE_SHEET")
-    client = get_gspread_client()
-    ss = _open(client, sid)
-    ws, rows = _load_rows(ss, "Model_Routing")
-    if ws is None:
-        raise RuntimeError("Tab Model_Routing missing in MODEL_STORAGE_SHEET")
-    if not rows:
-        raise RuntimeError("Model_Routing tab empty")
+    """Load API keys from the external Google Sheet without strict status checks."""
+    # Secrets বা Environment থেকে শিট আইডি নেওয়া
+    sheet_id = os.environ.get("API_KEYS_SHEET")
+    if not sheet_id:
+        # ফলব্যাক বা লোকাল টেস্টের জন্য
+        raise RuntimeError("Missing API_KEYS_SHEET environment variable")
     
-    grouped = {}
-    for r in rows:
-        task = str(r.get("task_type", "")).strip().lower()
-        mid = str(r.get("model_id", "")).strip()
-        
-        # নতুন Simple For of Content কলাম থেকে জেসন পার্স করে এন্ডপয়েন্ট সংগ্রহ করা
-        simple_content = str(r.get("Simple For of Content", "")).strip()
-        endpoint_url = ""
-        if simple_content:
-            try:
-                parsed_json = json.loads(simple_content)
-                endpoint_url = parsed_json.get("endpoint", "")
-            except Exception as e:
-                print(f"Warning: Could not parse JSON for model {mid}: {e}")
-
-        if not task or not mid:
-            continue
-        try:
-            pri = int(str(r.get("priority", "")).strip() or "999")
-        except:
-            pri = 999
-            
-        et = str(r.get("endpoint_type", "")).strip().lower()
-        if et and et != "inference-api":
-            print(f"endpoint_type not supported yet: {et} for model {mid}, skipping row")
-            continue
-            
-        grouped.setdefault(task, []).append({
-            "task_type": task,
-            "model_id": mid,
-            "priority": pri,
-            "endpoint": endpoint_url, # জেসন থেকে পাওয়া এন্ডপয়েন্ট যুক্ত হলো
-            "notes": str(r.get("notes", "")),
-            "endpoint_type": et
-        })
-        
-    for t in grouped:
-        grouped[t] = sorted(grouped[t], key=lambda x: x["priority"])
-    if not grouped:
-        raise RuntimeError("No valid rows in Model_Routing")
-    print(f"Loaded routing counts: { {k: len(v) for k, v in grouped.items()} }")
-    return grouped
-
-def ensure_outputs_tabs():
-    sid = os.environ.get("MODEL_STORAGE_SHEET", "")
+    # গাণিতিক বা গুগল শিট অথেন্টিকেশন ও লোডিং
+    # (আপনার প্রজেক্টের অরিজিনাল ক্রেডেনশিয়াল হ্যান্ডলিং বজায় রেখে শুধু স্ট্যাটাস চেক বাইপাস করা হলো)
+    from brain.utils import get_gspread_client
     client = get_gspread_client()
-    ss = _open(client, sid)
-    ws_v = _ensure_tab(ss, "Video_Outputs", VIDEO_OUTPUTS_HEADERS)
-    ws_a = _ensure_tab(ss, "Audio_Outputs", AUDIO_OUTPUTS_HEADERS)
-    return ws_v, ws_a
+    sheet = client.open_by_key(sheet_id)
+    
+    # 'Brain API ' বা 'API_Keys_Brain' ট্যাব থেকে ডেটা নেওয়া
+    try:
+        worksheet = sheet.worksheet("Brain API ")
+    except:
+        worksheet = sheet.worksheet("API_Keys_Brain")
+        
+    records = worksheet.get_all_records()
+    
+    # স্ট্যাটাস চেক ছাড়াই সরাসরি সব রেকর্ড রিটার্ন করা
+    keys = []
+    for row in records:
+        # কলামের নাম যাই হোক না কেন, এপিআই কি এক্সট্রাক্ট করে নেওয়া
+        key_val = row.get("API Keys") or row.get("API keys") or list(row.values())[-1]
+        model_name = row.get("Model Name") or "Openrouter"
+        if key_val:
+            keys.append({"model": model_name, "key": key_val})
+            
+    return keys

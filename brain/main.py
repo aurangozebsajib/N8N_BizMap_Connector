@@ -8,8 +8,6 @@ def run_plan():
     from brain.llm_pool import create_pool
     # try:
     # from brain.sheets import ensure_outputs_tabs
-except ImportError:
-    def ensure_outputs_tabs(*args, **kwargs):
         pass
     doc_id=os.environ.get(cfg.STORY_STORAGE_DOC,"")
     if not doc_id:

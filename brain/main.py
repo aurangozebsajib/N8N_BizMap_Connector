@@ -6,7 +6,7 @@ def run_plan():
     from brain.planner import run_segmentation
     from brain.character import get_character
     from brain.llm_pool import create_pool
-    from brain.sheets import ensure_outputs_tabs
+    # from brain.sheets import ensure_outputs_tabs
     doc_id=os.environ.get(cfg.STORY_STORAGE_DOC,"")
     if not doc_id:
         raise RuntimeError("Missing STORY_STORAGE_DOC")
@@ -52,7 +52,7 @@ def run_plan():
     narr_path.write_text(master_bn, encoding="utf-8")
     print(f"Wrote {plan_path} and {narr_path}")
     try:
-        ensure_outputs_tabs()
+        # ensure_outputs_tabs()
     except Exception as e:
         print(f"Warning ensure tabs failed: {e}")
     print(f"Plan done: {video_label} words {total_words} sec {total_sec} segments {len(segments)}")

@@ -64,13 +64,17 @@ app.get('/api/python-code', async (req, res) => {
     const mainPy = await fs.readFile('brain/main.py', 'utf-8').catch(() => '');
     const plannerPy = await fs.readFile('brain/planner.py', 'utf-8').catch(() => '');
     const videoEnginePy = await fs.readFile('brain/video_engine.py', 'utf-8').catch(() => '');
+    const sheetsPy = await fs.readFile('brain/sheets.py', 'utf-8').catch(() => '');
+    const hfClientPy = await fs.readFile('brain/hf_client.py', 'utf-8').catch(() => '');
     const pipelineYml = await fs.readFile('.github/workflows/pipeline.yml', 'utf-8').catch(() => '');
     const reqsTxt = await fs.readFile('requirements.txt', 'utf-8').catch(() => '');
 
     res.json({
-      'brain/main.py': mainPy,
-      'brain/planner.py': plannerPy,
       'brain/video_engine.py': videoEnginePy,
+      'brain/sheets.py': sheetsPy,
+      'brain/hf_client.py': hfClientPy,
+      'brain/planner.py': plannerPy,
+      'brain/main.py': mainPy,
       '.github/workflows/pipeline.yml': pipelineYml,
       'requirements.txt': reqsTxt
     });

@@ -1,0 +1,44 @@
+{
+  "video_label": "Video 1 | 2026-10-02",
+  "total_segments": 4,
+  "hf_keys_loaded": 0,
+  "success": true,
+  "segments": [
+    {
+      "segment_id": 1,
+      "video_type": "image-to-video",
+      "output_file": "segment_01_image-to-video.mp4",
+      "planned_duration_sec": 30.0,
+      "actual_size_bytes": 76086,
+      "status": "success-local-fallback",
+      "model_used": "local-ffmpeg-renderer"
+    },
+    {
+      "segment_id": 2,
+      "video_type": "text-animation",
+      "output_file": "segment_02_text-animation.mp4",
+      "planned_duration_sec": 5.2,
+      "actual_size_bytes": 15760,
+      "status": "success-local-fallback",
+      "model_used": "local-ffmpeg-renderer"
+    },
+    {
+      "segment_id": 3,
+      "video_type": "text-animation",
+      "output_file": "segment_03_text-animation.mp4",
+      "planned_duration_sec": 6.0,
+      "actual_size_bytes": 17943,
+      "status": "success-local-fallback",
+      "model_used": "local-ffmpeg-renderer"
+    },
+    {
+      "segment_id": 4,
+      "video_type": "text-animation",
+      "output_file": "segment_04_text-animation.mp4",
+      "planned_duration_sec": 4.8,
+      "actual_size_bytes": 13615,
+      "status": "success-local-fallback",
+      "model_used": "local-ffmpeg-renderer"
+    }
+  ]
+}

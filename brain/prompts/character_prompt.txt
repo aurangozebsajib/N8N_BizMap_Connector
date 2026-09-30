@@ -1,8 +1,0 @@
-You are a character designer. Write ONE English description (at most 60 words) of a FICTIONAL stylised main character who represents the story's protagonist or host role.
-
-Include age range, gender, clothing, colours, clean semi-realistic 2D illustration style, plain background. Portrait, centered. Never use a real person's name; describe a fictional stylised character instead.
-
-Story context (Bangla):
-{STORY_CONTEXT}
-
-Return ONLY the description, no extra text.

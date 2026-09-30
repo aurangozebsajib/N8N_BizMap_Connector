@@ -1,5 +1,0 @@
-google-auth>=2.0.0
-google-api-python-client>=2.0.0
-gspread>=5.0.0
-requests>=2.25.0
-pandas>=1.0.0

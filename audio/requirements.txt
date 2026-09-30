@@ -1,5 +1,0 @@
-gTTS
-pydub
-gspread
-google-auth
-requests

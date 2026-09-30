@@ -1,0 +1,7 @@
+{
+  "name": "N8N BizMap Connector & Bangla AI Video Factory",
+  "description": "Automated AI script planner, Bengali dialect transformer, audio TTS narrator, and storyboard video generator for BizMap & n8n workflows.",
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

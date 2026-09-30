@@ -1,0 +1,87 @@
+{
+  "video_label": "Video 1 | 2026-10-02",
+  "dialect_used": "rangpuri",
+  "character": {
+    "mode": "per_video",
+    "name": "রফিক মিয়া (Master Craftsman)",
+    "description": "A 45-year-old resilient Bangladeshi artisan in grey traditional cotton panjabi with folded sleeves, clean neutral minimalist workshop background.",
+    "age_range": "42-48 years",
+    "gender": "Male",
+    "clothing": "Traditional woven panjabi",
+    "colors": "Earthy grey, terracotta",
+    "style": "Clean semi-realistic 2D illustration"
+  },
+  "master_script_bn": "রংপুরের গংগাচড়ার তাঁতি রফিক মিয়া বিশ বছর ধরে ঐতিহ্যবাহী শতরঞ্জি তৈরি করছেন। আগে স্থানীয় হাটে খুব কম দামে বিক্রি করতে হতো।\nরফিক বললেন, \"হামার এই কষ্টের দাম শহরে কেউ দিতে চায় না বাহে। মুই কি আর করমু, দিনরাত পরিশ্রম করেও সংসারের খরচ ওঠে না।\"\nএরপর রফিকের ছেলে BizMap এর মাধ্যমে তাদের পণ্যের ফেসবুক পেজ এবং গুগল ম্যাপ লিস্টিং তৈরি করে দেয়।\nপ্রথম সপ্তাহেই ঢাকা ও চট্টগ্রাম থেকে সরাসরি পাইকারি অর্ডারের ফোন আসতে শুরু করে।\nপ্রথম শিক্ষা: সনাতন পণ্যকে ডিজিটাল প্ল্যাটফর্মে আনলে মধ্যস্বত্বভোগী ছাড়াই ন্যায্য মূল্য পাওয়া যায়।\nদ্বিতীয় শিক্ষা: সঠিক কন্টেন্ট এবং ভিডিওর মাধ্যমে পণ্যের সততা ফুটিয়ে তুললে ক্রেতার আস্থা দ্রুত বাড়ে।\nসারকথা: ঐতিহ্যের সাথে আধুনিক প্রযুক্তির মেলবন্ধনই গ্রামীণ ব্যবসার নতুন দিগন্ত খুলে দেয়।",
+  "total_words": 115,
+  "total_duration_sec": 46.0,
+  "segments": [
+    {
+      "segment_id": 1,
+      "chunk": 1,
+      "text_portion": "রংপুরের গংগাচড়ার তাঁতি রফিক মিয়া বিশ বছর ধরে ঐতিহ্যবাহী শতরঞ্জি তৈরি করছেন। আগে স্থানীয় হাটে খুব কম দামে বিক্রি করতে হতো। রফিক বললেন, \"হামার এই কষ্টের দাম শহরে কেউ দিতে চায় না বাহে। মুই কি আর করমু, দিনরাত পরিশ্রম করেও সংসারের খরচ ওঠে না। \" এরপর রফিকের ছেলে BizMap এর মাধ্যমে তাদের পণ্যের ফেসবুক পেজ এবং গুগল ম্যাপ লিস্টিং তৈরি করে দেয়। প্রথম সপ্তাহেই ঢাকা ও চট্টগ্রাম থেকে সরাসরি পাইকারি অর্ডারের ফোন আসতে শুরু করে।",
+      "word_count": 75,
+      "planned_duration_sec": 30.0,
+      "video_type": "image-to-video",
+      "visual_prompt": "A 45-year-old resilient Bangladeshi artisan in grey traditional cotton panjabi with folded sleeves, clean neutral minimalist workshop background. Centered portrait looking at camera with subtle breathing motion.",
+      "style_notes": "clean semi-realistic 2D illustration, soft lighting, warm colors",
+      "sound_design": {
+        "music_mood": "Warm acoustic dotara and light tabla",
+        "sfx": [
+          "subtle breeze"
+        ]
+      }
+    },
+    {
+      "segment_id": 2,
+      "chunk": 2,
+      "text_portion": "প্রথম শিক্ষা: সনাতন পণ্যকে ডিজিটাল প্ল্যাটফর্মে আনলে মধ্যস্বত্বভোগী ছাড়াই ন্যায্য মূল্য পাওয়া যায়।",
+      "word_count": 13,
+      "planned_duration_sec": 5.2,
+      "video_type": "text-animation",
+      "visual_prompt": "Kinetic typography in bold golden Bengali lettering on dark clean slate backdrop, highlighting key takeaway: প্রথম শিক্ষা: সনাতন পণ্যকে ডিজিটাল প্ল্যাটফর্মে আন",
+      "style_notes": "clean semi-realistic 2D illustration, soft lighting, warm colors",
+      "sound_design": {
+        "music_mood": "Uplifting crescendo acoustic folk melody",
+        "sfx": [
+          "bell chime",
+          "whoosh transition"
+        ]
+      }
+    },
+    {
+      "segment_id": 3,
+      "chunk": 3,
+      "text_portion": "দ্বিতীয় শিক্ষা: সঠিক কন্টেন্ট এবং ভিডিওর মাধ্যমে পণ্যের সততা ফুটিয়ে তুললে ক্রেতার আস্থা দ্রুত বাড়ে।",
+      "word_count": 15,
+      "planned_duration_sec": 6.0,
+      "video_type": "text-animation",
+      "visual_prompt": "Kinetic typography in bold golden Bengali lettering on dark clean slate backdrop, highlighting key takeaway: দ্বিতীয় শিক্ষা: সঠিক কন্টেন্ট এবং ভিডিওর মাধ্যমে ",
+      "style_notes": "clean semi-realistic 2D illustration, soft lighting, warm colors",
+      "sound_design": {
+        "music_mood": "Uplifting crescendo acoustic folk melody",
+        "sfx": [
+          "bell chime",
+          "whoosh transition"
+        ]
+      }
+    },
+    {
+      "segment_id": 4,
+      "chunk": 4,
+      "text_portion": "সারকথা: ঐতিহ্যের সাথে আধুনিক প্রযুক্তির মেলবন্ধনই গ্রামীণ ব্যবসার নতুন দিগন্ত খুলে দেয়।",
+      "word_count": 12,
+      "planned_duration_sec": 4.8,
+      "video_type": "text-animation",
+      "visual_prompt": "Kinetic typography in bold golden Bengali lettering on dark clean slate backdrop, highlighting key takeaway: সারকথা: ঐতিহ্যের সাথে আধুনিক প্রযুক্তির মেলবন্ধনই ",
+      "style_notes": "clean semi-realistic 2D illustration, soft lighting, warm colors",
+      "sound_design": {
+        "music_mood": "Uplifting crescendo acoustic folk melody",
+        "sfx": [
+          "bell chime",
+          "whoosh transition"
+        ]
+      }
+    }
+  ],
+  "created_at": "2026-09-30T04:47:03.028275+00:00"
+}

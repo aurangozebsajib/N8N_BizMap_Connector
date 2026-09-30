@@ -58,6 +58,27 @@ app.get('/api/sample-stories', (req, res) => {
   res.json(SAMPLE_STORIES);
 });
 
+app.get('/api/python-code', async (req, res) => {
+  try {
+    const fs = await import('fs/promises');
+    const mainPy = await fs.readFile('brain/main.py', 'utf-8').catch(() => '');
+    const plannerPy = await fs.readFile('brain/planner.py', 'utf-8').catch(() => '');
+    const videoEnginePy = await fs.readFile('brain/video_engine.py', 'utf-8').catch(() => '');
+    const pipelineYml = await fs.readFile('.github/workflows/pipeline.yml', 'utf-8').catch(() => '');
+    const reqsTxt = await fs.readFile('requirements.txt', 'utf-8').catch(() => '');
+
+    res.json({
+      'brain/main.py': mainPy,
+      'brain/planner.py': plannerPy,
+      'brain/video_engine.py': videoEnginePy,
+      '.github/workflows/pipeline.yml': pipelineYml,
+      'requirements.txt': reqsTxt
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.post('/api/plan', async (req, res) => {
   try {
     const { rawText, videoNumber, dateStr, dialect, maxSegments, characterMode } = req.body;
